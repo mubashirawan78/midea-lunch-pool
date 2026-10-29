@@ -1,0 +1,10 @@
+'use client';
+import {useState} from 'react';
+import {ArrowRight,UtensilsCrossed} from 'lucide-react';
+export default function Login(){
+ const [email,setEmail]=useState(''),[password,setPassword]=useState(''),[error,setError]=useState(''),[busy,setBusy]=useState(false);
+ async function submit(e:React.FormEvent){e.preventDefault();setBusy(true);setError('');try{
+ const res=await fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password,returnTo:new URLSearchParams(location.search).get('returnTo')||'/'})});const data=await res.json();if(!res.ok)throw Error(data.error||'Unable to sign in.');location.assign(data.returnTo);
+ }catch(e){setError(e instanceof Error?e.message:'Unable to sign in.');setBusy(false);}}
+ return <main className="auth-shell"><section className="auth-intro"><a className="brand" href="/">Midea<span>Lunch Pool</span></a><div><p className="eyebrow">RIYADH OFFICE</p><h1>Good food.<br/>Great company.<br/>Fair shares.</h1><p>Your lunch break, with the maths taken care of.</p></div><UtensilsCrossed size={90} strokeWidth={1}/></section><section className="auth-form card"><span className="pill auth-pill">WELCOME TO THE TABLE</span><h2>Sign in to lunch.</h2><p className="muted">Use the team account set up by your organizer.</p>{error&&<div role="alert" className="alert error">{error}</div>}<form onSubmit={submit}><label>Work email<input type="email" autoComplete="username" required maxLength={254} value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@company.com"/></label><label>Password<input type="password" autoComplete="current-password" required value={password} onChange={e=>setPassword(e.target.value)}/></label><button className="primary full" disabled={busy}>{busy?'Signing in…':'Sign in'}<ArrowRight size={17}/></button></form><p className="muted small">Need access or a password reset? Contact your team organizer.</p><a className="text-button" href="/">← Back to lunch pools</a></section></main>;
+}
